@@ -1,0 +1,3 @@
+rootProject.name = "PermissionsX"
+include ':app'
+include ':permissionsx'
