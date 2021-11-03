@@ -33,37 +33,37 @@ private fun isAtLeastAndroid(versionCode: Int): Boolean = Build.VERSION.SDK_INT 
 /**
  * 是否是 Android 12 及以上版本
  */
-internal fun isAtLastAndroid12(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.R + 1)
+internal fun isAtLeastAndroid12(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.R + 1)
 
 /**
  * 是否是 Android 11 及以上版本
  */
-internal fun isAtLastAndroid11(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.R)
+internal fun isAtLeastAndroid11(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.R)
 
 /**
  * 是否是 Android 10 及以上版本
  */
-internal fun isAtLastAndroid10(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.Q)
+internal fun isAtLeastAndroid10(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.Q)
 
 /**
  * 是否是 Android 9 及以上版本
  */
-internal fun isAtLastAndroid9(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.P)
+internal fun isAtLeastAndroid9(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.P)
 
 /**
  * 是否是 Android 8 及以上版本
  */
-internal fun isAtLastAndroid8(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.O)
+internal fun isAtLeastAndroid8(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.O)
 
 /**
  * 是否是 Android 7 及以上版本
  */
-internal fun isAtLastAndroid7(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.N)
+internal fun isAtLeastAndroid7(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.N)
 
 /**
  * 是否是 Android 6 及以上版本
  */
-internal fun isAtLastAndroid6(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.M)
+internal fun isAtLeastAndroid6(): Boolean = isAtLeastAndroid(Build.VERSION_CODES.M)
 
 /**
  * 解析清单文件
@@ -117,7 +117,7 @@ internal fun isScopedStorage(context: Context): Boolean {
  */
 internal fun isActivityReverse(activity: ComponentActivity): Boolean {
     // 获取 Activity 旋转的角度
-    val rotation = if (isAtLastAndroid11()) activity.display?.rotation
+    val rotation = if (isAtLeastAndroid11()) activity.display?.rotation
     else activity.windowManager.defaultDisplay.rotation
     return when (rotation) {
         Surface.ROTATION_180, Surface.ROTATION_270 -> true
@@ -170,7 +170,7 @@ internal fun deniedPermissions(permissions: Array<String>, grantResults: IntArra
  */
 internal fun deniedPermissions(context: Context, permissions: Array<String>): List<String> {
     /*  如果是安卓 6.0 以下版本就默认授予  */
-    return if (!isAtLastAndroid6()) permissions.toList() else permissions.filter { !isPermissionGranted(context, it) }
+    return if (!isAtLeastAndroid6()) permissions.toList() else permissions.filter { !isPermissionGranted(context, it) }
 }
 
 /**
@@ -231,28 +231,28 @@ internal fun manifestPermissions(context: Context): Map<String, Int> {
  * 是否有存储权限
  */
 internal fun isStoragePermissionsGranted(context: Context): Boolean {
-    return if (isAtLastAndroid11()) Environment.isExternalStorageManager()
+    return if (isAtLeastAndroid11()) Environment.isExternalStorageManager()
     else isPermissionsAllGranted(context, Permission.Group.STORAGE.toList())
 }
 
 /**
  * 是否有安装权限
  */
-internal fun isInstallPermissionGranted(context: Context): Boolean = if (isAtLastAndroid8())
+internal fun isInstallPermissionGranted(context: Context): Boolean = if (isAtLeastAndroid8())
     context.packageManager.canRequestPackageInstalls() else true
 
 /**
  * 是否有悬浮窗权限
  */
-internal fun isWindowPermissionGranted(context: Context): Boolean = if (isAtLastAndroid6())
+internal fun isWindowPermissionGranted(context: Context): Boolean = if (isAtLeastAndroid6())
     Settings.canDrawOverlays(context) else true
 
 /**
  * 是否有通知栏权限
  */
 internal fun isNotificationPermissionGranted(context: Context): Boolean {
-    return if (isAtLastAndroid7()) context.getSystemService(NotificationManager::class.java).areNotificationsEnabled()
-    else if (isAtLastAndroid6()) {
+    return if (isAtLeastAndroid7()) context.getSystemService(NotificationManager::class.java).areNotificationsEnabled()
+    else if (isAtLeastAndroid6()) {
         try {
             val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
             val checkOpNoThrow = appOpsManager.javaClass.getMethod(
@@ -287,14 +287,14 @@ internal fun isNotificationPermissionGranted(context: Context): Boolean {
  * 是否有系统设置权限
  */
 internal fun isSettingPermissionGranted(context: Context): Boolean =
-    if (isAtLastAndroid6()) Settings.System.canWrite(context) else true
+    if (isAtLeastAndroid6()) Settings.System.canWrite(context) else true
 
 /**
  * 判断某些权限是否全部被授予
  */
 internal fun isPermissionsAllGranted(context: Context, permissions: List<String>?): Boolean {
     // 如果是安卓 6.0 以下版本就直接返回 true
-    if (!isAtLastAndroid6()) {
+    if (!isAtLeastAndroid6()) {
         return true
     }
     return permissions?.all { isPermissionGranted(context, it) } ?: false
@@ -304,7 +304,7 @@ internal fun isPermissionsAllGranted(context: Context, permissions: List<String>
  * 判断某个权限是否授予
  */
 internal fun isPermissionGranted(context: Context, permission: String): Boolean {
-    if (!isAtLastAndroid6()) {
+    if (!isAtLeastAndroid6()) {
         return true
     }
     return when {
@@ -319,32 +319,32 @@ internal fun isPermissionGranted(context: Context, permission: String): Boolean 
         /*  检测系统权限  */
         permission == Permission.WRITE_SETTINGS -> isSettingPermissionGranted(context)
         /*  检测 Android 12 的三个新权限  */
-        !isAtLastAndroid12() && permission == Permission.BLUETOOTH_SCAN -> ContextCompat.checkSelfPermission(
+        !isAtLeastAndroid12() && permission == Permission.BLUETOOTH_SCAN -> ContextCompat.checkSelfPermission(
             context,
             Permission.ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
-        !isAtLastAndroid12() && (permission == Permission.BLUETOOTH_CONNECT || permission == Permission.BLUETOOTH_ADVERTISE) -> true
+        !isAtLeastAndroid12() && (permission == Permission.BLUETOOTH_CONNECT || permission == Permission.BLUETOOTH_ADVERTISE) -> true
         /*  检测 Android 10 的三个新权限  */
-        !isAtLastAndroid10() && permission == Permission.ACCESS_BACKGROUND_LOCATION ->
+        !isAtLeastAndroid10() && permission == Permission.ACCESS_BACKGROUND_LOCATION ->
             ContextCompat.checkSelfPermission(
                 context,
                 Permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
-        !isAtLastAndroid10() && permission == Permission.ACTIVITY_RECOGNITION ->
+        !isAtLeastAndroid10() && permission == Permission.ACTIVITY_RECOGNITION ->
             ContextCompat.checkSelfPermission(
                 context,
                 Permission.BODY_SENSORS
             ) == PackageManager.PERMISSION_GRANTED
-        !isAtLastAndroid10() && permission == Permission.ACCESS_MEDIA_LOCATION -> true
+        !isAtLeastAndroid10() && permission == Permission.ACCESS_MEDIA_LOCATION -> true
         /*  检测 Android 9 的一个新权限  */
-        !isAtLastAndroid9() && permission == Permission.ACCEPT_HANDOVER -> true
+        !isAtLeastAndroid9() && permission == Permission.ACCEPT_HANDOVER -> true
         /*  检测 Android 8 的二个新权限  */
-        !isAtLastAndroid8() && permission == Permission.READ_PHONE_NUMBERS ->
+        !isAtLeastAndroid8() && permission == Permission.READ_PHONE_NUMBERS ->
             ContextCompat.checkSelfPermission(
                 context,
                 Permission.READ_PHONE_STATE
             ) == PackageManager.PERMISSION_GRANTED
-        !isAtLastAndroid8() && permission == Permission.ANSWER_PHONE_CALLS -> true
+        !isAtLeastAndroid8() && permission == Permission.ANSWER_PHONE_CALLS -> true
         else -> ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
     }
 }
@@ -360,24 +360,24 @@ internal fun internalPermissionResult(activity: ComponentActivity, permissions: 
             checkPermissionAgain = true
         }
         /*  重新检查 Android 12 的三个新权限  */
-        if (!isAtLastAndroid12() && (permission == Permission.BLUETOOTH_SCAN
+        if (!isAtLeastAndroid12() && (permission == Permission.BLUETOOTH_SCAN
                     || permission == Permission.BLUETOOTH_CONNECT
                     || permission == Permission.BLUETOOTH_ADVERTISE)) {
             checkPermissionAgain = true
         }
         /*  重新检查 Android 10.0 的三个新权限  */
-        if (!isAtLastAndroid10() && (permission == Permission.ACCESS_BACKGROUND_LOCATION
+        if (!isAtLeastAndroid10() && (permission == Permission.ACCESS_BACKGROUND_LOCATION
                     || permission == Permission.ACTIVITY_RECOGNITION
                     || permission == Permission.ACCESS_MEDIA_LOCATION)) {
             checkPermissionAgain = true
         }
 
         /*  重新检查 Android 9.0 的一个新权限  */
-        if (!isAtLastAndroid9() && permission == Permission.ACCEPT_HANDOVER) {
+        if (!isAtLeastAndroid9() && permission == Permission.ACCEPT_HANDOVER) {
             checkPermissionAgain = true
         }
         /*   重新检查 Android 8.0 的两个新权限  */
-        if (!isAtLastAndroid8() && (permission == Permission.ANSWER_PHONE_CALLS
+        if (!isAtLeastAndroid8() && (permission == Permission.ANSWER_PHONE_CALLS
                     || permission == Permission.READ_PHONE_NUMBERS)) {
             checkPermissionAgain = true
         }
@@ -398,35 +398,35 @@ internal fun internalPermissionResult(activity: ComponentActivity, permissions: 
  */
 internal fun isPermissionPermanentlyDenied(activity: ComponentActivity, permission: String): Boolean {
     return when {
-        !isAtLastAndroid6() -> false
+        !isAtLeastAndroid6() -> false
         /*  特殊权限不算，本身申请方式和危险权限申请方式不同，因为没有永久拒绝的选项，所以这里返回 false  */
         isSpecialPermission(permission) -> false
-        !isAtLastAndroid12() && permission == Permission.BLUETOOTH_SCAN ->
+        !isAtLeastAndroid12() && permission == Permission.BLUETOOTH_SCAN ->
             !isPermissionGranted(activity, Permission.ACCESS_COARSE_LOCATION)
                     && !activity.shouldShowRequestPermissionRationale(Permission.ACCESS_COARSE_LOCATION)
-        !isAtLastAndroid12() && (permission == Permission.BLUETOOTH_CONNECT || permission == Permission.BLUETOOTH_ADVERTISE) -> false
+        !isAtLeastAndroid12() && (permission == Permission.BLUETOOTH_CONNECT || permission == Permission.BLUETOOTH_ADVERTISE) -> false
         /*  重新检测后台定位权限是否永久拒绝  */
-        isAtLastAndroid10() && permission == Permission.ACCESS_BACKGROUND_LOCATION
+        isAtLeastAndroid10() && permission == Permission.ACCESS_BACKGROUND_LOCATION
                 && !isPermissionGranted(activity, Permission.ACCESS_BACKGROUND_LOCATION)
                 && !isPermissionGranted(
             activity,
             Permission.ACCESS_FINE_LOCATION
         ) -> !activity.shouldShowRequestPermissionRationale(Permission.ACCESS_FINE_LOCATION)
         /*  检测 Android 10 的三个新权限  */
-        !isAtLastAndroid10() && permission == Permission.ACCESS_BACKGROUND_LOCATION -> !isPermissionGranted(
+        !isAtLeastAndroid10() && permission == Permission.ACCESS_BACKGROUND_LOCATION -> !isPermissionGranted(
             activity,
             Permission.ACCESS_FINE_LOCATION
         ) && !activity.shouldShowRequestPermissionRationale(Permission.ACCESS_FINE_LOCATION)
-        !isAtLastAndroid10() && permission == Permission.ACTIVITY_RECOGNITION -> !isPermissionGranted(
+        !isAtLeastAndroid10() && permission == Permission.ACTIVITY_RECOGNITION -> !isPermissionGranted(
             activity,
             Permission.BODY_SENSORS
         ) && !activity.shouldShowRequestPermissionRationale(Permission.BODY_SENSORS)
-        !isAtLastAndroid10() && permission == Permission.ACCESS_MEDIA_LOCATION -> false
+        !isAtLeastAndroid10() && permission == Permission.ACCESS_MEDIA_LOCATION -> false
         /*  检测 Android 9 的一个新权限  */
-        !isAtLastAndroid9() && permission == Permission.ACCEPT_HANDOVER -> false
+        !isAtLeastAndroid9() && permission == Permission.ACCEPT_HANDOVER -> false
         /*  检测 Android 8 的二个新权限  */
-        !isAtLastAndroid8() && permission == Permission.ANSWER_PHONE_CALLS -> false
-        !isAtLastAndroid8() && permission == Permission.READ_PHONE_NUMBERS -> !isPermissionGranted(
+        !isAtLeastAndroid8() && permission == Permission.ANSWER_PHONE_CALLS -> false
+        !isAtLeastAndroid8() && permission == Permission.READ_PHONE_NUMBERS -> !isPermissionGranted(
             activity,
             Permission.READ_PHONE_STATE
         ) && !activity.shouldShowRequestPermissionRationale(Permission.READ_PHONE_STATE)
