@@ -197,4 +197,12 @@ object Permission {
         /** 蓝牙权限  */
         val BLUETOOTH = arrayOf(BLUETOOTH_SCAN, BLUETOOTH_CONNECT, BLUETOOTH_ADVERTISE)
     }
+
+    val SPECIAL_PERMISSIONS = listOf(
+        MANAGE_EXTERNAL_STORAGE,
+        REQUEST_INSTALL_PACKAGES,
+        SYSTEM_ALERT_WINDOW,
+        NOTIFICATION_SERVICE,
+        WRITE_SETTINGS
+    )
 }
