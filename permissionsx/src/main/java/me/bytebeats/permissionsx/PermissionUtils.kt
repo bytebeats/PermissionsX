@@ -26,9 +26,9 @@ import java.lang.reflect.InvocationTargetException
  */
 
 /** Android 命名空间  */
-private const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
+const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
 
-private fun isAtLeastAndroid(versionCode: Int): Boolean = Build.VERSION.SDK_INT >= versionCode
+internal fun isAtLeastAndroid(versionCode: Int): Boolean = Build.VERSION.SDK_INT >= versionCode
 
 /**
  * 是否是 Android 12 及以上版本
