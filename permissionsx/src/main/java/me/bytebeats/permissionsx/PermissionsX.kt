@@ -107,8 +107,6 @@ class PermissionsX private constructor(private val context: Context) {
 
         fun with(fragment: Fragment): PermissionsX = with(fragment.requireActivity())
 
-        fun with(activity: FragmentActivity): PermissionsX = with(activity)
-
         fun debugMode(debugMode: Boolean) {
             sDebugMode = debugMode
         }

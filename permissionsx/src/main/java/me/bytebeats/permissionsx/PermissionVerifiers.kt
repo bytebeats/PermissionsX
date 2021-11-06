@@ -56,9 +56,8 @@ internal fun verifyActivity(activity: ComponentActivity?, debugMode: Boolean): B
 /**
  * 检查传入的权限是否符合要求
  *
- * @param requestPermissions        请求的权限组
- * @param debugMode                 是否是调试模式
- * @return                          是否检查通过
+ * @param permissions        请求的权限组
+ * @param debugMode          是否是调试模式
  */
 @Throws(IllegalArgumentException::class)
 internal fun verifyPermissionGroup(permissions: List<String>?, debugMode: Boolean): Boolean {
