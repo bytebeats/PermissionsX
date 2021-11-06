@@ -1,7 +1,9 @@
 package me.bytebeats.permissionsx
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
+import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
@@ -144,5 +146,113 @@ class PermissionsX private constructor(private val context: Context) {
 
         fun denied(context: Context, vararg permissionGroups: Array<String>): List<String> =
             denied(context, permissionGroups.flatMap { it.toList() })
+
+        /**
+         * 判断某个权限是否为特殊权限
+         */
+        fun isSpecial(permission: String): Boolean = isSpecialPermission(permission)
+
+        /**
+         * 判断一个或多个权限是否被永久拒绝了（注意不能在请求权限之前调用，应该在 {@link OnPermissionCallback#onDenied(List, boolean)} 方法中调用）
+         */
+        fun isPermanentlyDenied(activity: FragmentActivity, permissions: List<String>): Boolean =
+            hasPermissionPermanentlyDenied(activity, permissions)
+
+        fun isPermanentlyDenied(activity: FragmentActivity, vararg permissions: String): Boolean =
+            isPermanentlyDenied(activity, permissions.toList())
+
+        fun isPermanentlyDenied(activity: FragmentActivity, vararg permissionGroups: Array<String>): Boolean =
+            isPermanentlyDenied(activity, permissionGroups.flatMap { it.toList() })
+
+        /**
+         * 跳转到应用权限设置页
+         *
+         * @param permissions           没有授予或者被拒绝的权限组
+         * @param requestCode           Activity 跳转请求码
+         */
+        @JvmOverloads
+        fun startPermissionSettingPage(
+            context: Context,
+            permissions: List<String>? = null,
+            requestCode: Int = REQUEST_CODE
+        ) {
+            val activity = findActivity(context)
+            if (activity != null) {
+                startPermissionSettingPage(activity, permissions, requestCode)
+            } else {
+                val intent = smartMatchPermissionIntent(context, permissions)
+                if (context !is ComponentActivity) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+            }
+        }
+
+        fun startPermissionSettingPage(context: Context, vararg permissions: String) {
+            startPermissionSettingPage(context, permissions.toList())
+        }
+
+        fun startPermissionSettingPage(context: Context, vararg permissionGroups: Array<String>) {
+            startPermissionSettingPage(context, permissionGroups.flatMap { it.toList() })
+        }
+
+        /**
+         * 跳转到应用权限设置页
+         *
+         * @param permissions           没有授予或者被拒绝的权限组
+         * @param requestCode           Activity 跳转请求码
+         */
+        @JvmOverloads
+        fun startPermissionSettingPage(
+            activity: FragmentActivity,
+            permissions: List<String>? = null,
+            requestCode: Int = REQUEST_CODE
+        ) {
+            activity.startActivityForResult(
+                smartMatchPermissionIntent(activity, permissions),
+                requestCode
+            )
+        }
+
+        fun startPermissionSettingPage(activity: FragmentActivity, vararg permissions: String) {
+            startPermissionSettingPage(activity, permissions.toList())
+        }
+
+        fun startPermissionSettingPage(activity: FragmentActivity, vararg permissionGroups: Array<String>) {
+            startPermissionSettingPage(activity, permissionGroups.flatMap { it.toList() })
+        }
+
+        /**
+         * 跳转到应用权限设置页
+         *
+         * @param permissions           没有授予或者被拒绝的权限组
+         * @param requestCode           Activity 跳转请求码
+         */
+        @JvmOverloads
+        fun startPermissionSettingPage(
+            fragment: Fragment,
+            permissions: List<String>? = null,
+            requestCode: Int = REQUEST_CODE
+        ) {
+            fragment.activity?.let {
+                it.startActivityForResult(
+                    smartMatchPermissionIntent(it, permissions),
+                    requestCode
+                )
+            }
+        }
+
+        fun startPermissionSettingPage(
+            fragment: Fragment, vararg permissions: String
+        ) {
+            startPermissionSettingPage(fragment, permissions.toList())
+        }
+
+        fun startPermissionSettingPage(
+            fragment: Fragment, vararg permissionGroups: Array<String>
+        ) {
+            startPermissionSettingPage(fragment, permissionGroups.flatMap { it.toList() })
+        }
     }
+
 }
