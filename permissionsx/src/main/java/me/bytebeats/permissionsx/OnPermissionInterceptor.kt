@@ -1,6 +1,7 @@
 package me.bytebeats.permissionsx
 
 import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 
 /**
  * @Author bytebeats
@@ -16,10 +17,12 @@ interface OnPermissionInterceptor {
      * 权限申请拦截，可在此处先弹 Dialog 再申请权限
      */
     fun requestPermissions(
-        activity: ComponentActivity,
-        permissions: List<String>,
+        activity: FragmentActivity,
+        permissions: ArrayList<String>,
         callback: OnPermissionRequestCallback? = null
-    )
+    ) {
+        PermissionFragment.beginRequest(activity, permissions, null, callback)
+    }
 
     /**
      * 权限授予回调拦截, 参见 {@link OnPermissionRequestCallback#onGranted(List, boolean)}

@@ -12,6 +12,7 @@ import android.provider.Settings
 import android.view.Surface
 import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentActivity
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.lang.reflect.InvocationTargetException
@@ -26,9 +27,9 @@ import java.lang.reflect.InvocationTargetException
  */
 
 /** Android 命名空间  */
-private const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
+const val ANDROID_NAMESPACE = "http://schemas.android.com/apk/res/android"
 
-private fun isAtLeastAndroid(versionCode: Int): Boolean = Build.VERSION.SDK_INT >= versionCode
+internal fun isAtLeastAndroid(versionCode: Int): Boolean = Build.VERSION.SDK_INT >= versionCode
 
 /**
  * 是否是 Android 12 及以上版本
@@ -128,10 +129,10 @@ internal fun isActivityReverse(activity: ComponentActivity): Boolean {
 /**
  * 寻找上下文中的 Activity 对象
  */
-internal fun findActivity(context: Context?): ComponentActivity? {
+internal fun findActivity(context: Context?): FragmentActivity? {
     var ctx: Context? = context
     while (ctx != null) {
-        if (ctx is ComponentActivity) {
+        if (ctx is FragmentActivity) {
             return ctx
         } else if (ctx is ContextWrapper) {
             ctx = ctx.baseContext
@@ -148,7 +149,7 @@ internal fun findActivity(context: Context?): ComponentActivity? {
  * @param permissions   需要请求的权限组
  * @param grantResults  允许结果组
  */
-internal fun grantedPermissions(permissions: Array<String>, grantResults: IntArray): List<String> {
+internal fun grantedPermissions(permissions: Array<out String>, grantResults: IntArray): List<String> {
     return permissions.filterIndexed { index, _ -> grantResults[index] == PackageManager.PERMISSION_GRANTED }.toList()
 }
 
@@ -158,7 +159,7 @@ internal fun grantedPermissions(permissions: Array<String>, grantResults: IntArr
  * @param permissions   需要请求的权限组
  * @param grantResults  允许结果组
  */
-internal fun deniedPermissions(permissions: Array<String>, grantResults: IntArray): List<String> {
+internal fun deniedPermissions(permissions: Array<out String>, grantResults: IntArray): List<String> {
     return permissions.filterIndexed { index, _ -> grantResults[index] == PackageManager.PERMISSION_DENIED }.toList()
 }
 
@@ -168,9 +169,9 @@ internal fun deniedPermissions(permissions: Array<String>, grantResults: IntArra
  * @param context  Context
  * @param permissions   需要请求的权限组
  */
-internal fun deniedPermissions(context: Context, permissions: Array<String>): List<String> {
+internal fun deniedPermissions(context: Context, permissions: List<String>): List<String> {
     /*  如果是安卓 6.0 以下版本就默认授予  */
-    return if (!isAtLeastAndroid6()) permissions.toList() else permissions.filter { !isPermissionGranted(context, it) }
+    return if (!isAtLeastAndroid6()) permissions else permissions.filter { !isPermissionGranted(context, it) }
 }
 
 /**
@@ -352,7 +353,11 @@ internal fun isPermissionGranted(context: Context, permission: String): Boolean 
 /**
  * 优化权限回调结果
  */
-internal fun internalPermissionResult(activity: ComponentActivity, permissions: Array<String>, grantResults: IntArray) {
+internal fun optimizePermissionResults(
+    activity: ComponentActivity,
+    permissions: Array<out String>,
+    grantResults: IntArray
+) {
     permissions.forEachIndexed { index, permission ->
         var checkPermissionAgain = false
         /*  如果这个权限是特殊权限，那么就重新进行权限检测  */
